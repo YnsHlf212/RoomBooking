@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\MailService;
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
@@ -26,7 +27,8 @@ final class ReservationController extends AbstractController
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
-        ReservationRepository $reservationRepository
+        ReservationRepository $reservationRepository,
+        MailService $mailService
     ): Response
     {
         $reservation = new Reservation();
@@ -34,8 +36,7 @@ final class ReservationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
-            // Vérifier les conflits de réservation
+
             $conflicts = $reservationRepository->findConflicts(
                 $reservation->getRoom(),
                 $reservation->getStartDatetime(),
@@ -43,14 +44,13 @@ final class ReservationController extends AbstractController
             );
 
             if (count($conflicts) > 0) {
-                $this->addFlash('error', 'Cette salle est déjà réservée sur ce créneau. Veuillez choisir un autre horaire.');
+                $this->addFlash('error', 'Cette salle est déjà réservée sur ce créneau.');
                 return $this->render('reservation/new.html.twig', [
                     'reservation' => $reservation,
                     'form' => $form,
                 ]);
             }
 
-            // Vérifier que la date de fin est après la date de début
             if ($reservation->getEndDatetime() <= $reservation->getStartDatetime()) {
                 $this->addFlash('error', 'La date de fin doit être après la date de début.');
                 return $this->render('reservation/new.html.twig', [
@@ -59,7 +59,6 @@ final class ReservationController extends AbstractController
                 ]);
             }
 
-            // Vérifier que la réservation n'est pas dans le passé
             if ($reservation->getStartDatetime() < new \DateTimeImmutable()) {
                 $this->addFlash('error', 'Impossible de réserver dans le passé.');
                 return $this->render('reservation/new.html.twig', [
@@ -72,6 +71,13 @@ final class ReservationController extends AbstractController
             $reservation->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($reservation);
             $entityManager->flush();
+
+            // Envoi de l'email de confirmation (optionnel)
+            try {
+                $mailService->sendReservationConfirmation($reservation);
+            } catch (\Exception $e) {
+                // On ne bloque pas si l'email échoue
+            }
 
             $this->addFlash('success', 'Réservation créée avec succès !');
             return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
