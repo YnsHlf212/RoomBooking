@@ -25,7 +25,7 @@ class Equipment
     /**
      * @var Collection<int, Room>
      */
-    #[ORM\OneToMany(targetEntity: Room::class, mappedBy: 'equipments')]
+    #[ORM\ManyToMany(targetEntity: Room::class, mappedBy: 'equipments')]
     private Collection $rooms;
 
     public function __construct()
@@ -46,7 +46,6 @@ class Equipment
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -58,7 +57,6 @@ class Equipment
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -74,21 +72,16 @@ class Equipment
     {
         if (!$this->rooms->contains($room)) {
             $this->rooms->add($room);
-            $room->setEquipments($this);
+            $room->addEquipment($this);
         }
-
         return $this;
     }
 
     public function removeRoom(Room $room): static
     {
         if ($this->rooms->removeElement($room)) {
-            // set the owning side to null (unless already changed)
-            if ($room->getEquipments() === $this) {
-                $room->setEquipments(null);
-            }
+            $room->removeEquipment($this);
         }
-
         return $this;
     }
 }

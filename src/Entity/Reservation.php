@@ -24,6 +24,18 @@ class Reservation
     #[ORM\ManyToOne(inversedBy: 'bookedForReservations')]
     private ?User $bookedFor = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $startDatetime = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $endDatetime = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $cancelledAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +73,54 @@ class Reservation
     public function setBookedFor(?User $bookedFor): static
     {
         $this->bookedFor = $bookedFor;
+
+        return $this;
+    }
+
+    public function getStartDatetime(): ?\DateTimeImmutable
+    {
+        return $this->startDatetime;
+    }
+
+    public function setStartDatetime(\DateTimeImmutable $startDatetime): static
+    {
+        $this->startDatetime = $startDatetime;
+
+        return $this;
+    }
+
+    public function getEndDatetime(): ?\DateTimeImmutable
+    {
+        return $this->endDatetime;
+    }
+
+    public function setEndDatetime(\DateTimeImmutable $endDatetime): static
+    {
+        $this->endDatetime = $endDatetime;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCancelledAt(): ?\DateTimeImmutable
+    {
+        return $this->cancelledAt;
+    }
+
+    public function setCancelledAt(?\DateTimeImmutable $cancelledAt): static
+    {
+        $this->cancelledAt = $cancelledAt;
 
         return $this;
     }
