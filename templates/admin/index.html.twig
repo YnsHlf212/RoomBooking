@@ -3,12 +3,24 @@
 {% block title %}Dashboard Admin{% endblock %}
 
 {% block body %}
-    <h1>Zone Administration</h1>
-    <p>Bienvenue {{ app.user.firstName }}, vous êtes administrateur.</p>
+    <h1>⚙️ Administration</h1>
+    <p>Bienvenue {{ app.user.firstName }}, vous gérez l'application.</p>
 
-    <ul>
-        <li><a href="#">Gérer les salles</a></li>
-        <li><a href="#">Gérer les utilisateurs</a></li>
-        <li><a href="#">Gérer les promotions</a></li>
-    </ul>
+    <div class="dashboard-cards">
+        <div class="card">
+            <h2>🏠 Salles</h2>
+            <a href="{{ path('app_room_index') }}" class="btn">Gérer les salles</a>
+            <a href="{{ path('app_room_new') }}" class="btn btn-primary">+ Nouvelle salle</a>
+        </div>
+
+        <div class="card">
+            <h2>👥 Utilisateurs</h2>
+            <a href="{{ path('app_user_index') }}" class="btn">Gérer les utilisateurs</a>
+        </div>
+
+        <div class="card">
+            <h2>📅 Réservations</h2>
+            <a href="{{ path('app_reservation_index') }}" class="btn">Toutes les réservations</a>
+        </div>
+    </div>
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <h1>Mon profil</h1>
+
+    <div class="profile-card">
+        <p><strong>Prénom :</strong> {{ user.firstName }}</p>
+        <p><strong>Nom :</strong> {{ user.lastName }}</p>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        <p><strong>Rôle :</strong> {{ user.roles|join(', ') }}</p>
+        {% if user.promotion %}
+            <p><strong>Promotion :</strong> {{ user.promotion.name }}</p>
+        {% endif %}
+        <p><strong>Membre depuis :</strong> {{ user.createdAt|date('d/m/Y') }}</p>
+    </div>
+
+    <a href="{{ path('app_profile_edit') }}" class="btn">Modifier mon profil</a>
+    <a href="{{ path('app_reservation_index') }}" class="btn">Mes réservations</a>
+{% endblock %}

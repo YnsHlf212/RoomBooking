@@ -3,7 +3,38 @@
 {% block title %}Accueil — RoomBooking{% endblock %}
 
 {% block body %}
-    <h1>Bienvenue sur RoomBooking</h1>
-    <p>Connecté en tant que : {{ app.user.email }}</p>
-    <p>Rôle : {{ app.user.roles|join(', ') }}</p>
+    <section class="hero">
+        <h1>Bienvenue, {{ app.user.firstName }} 👋</h1>
+        <p>Gérez vos réservations de salles simplement et rapidement.</p>
+    </section>
+
+    <section class="dashboard-cards">
+
+        <div class="card">
+            <h2>🏠 Salles</h2>
+            <p>Consultez les salles disponibles et leurs équipements.</p>
+            <a href="{{ path('app_room_index') }}" class="btn">Voir les salles</a>
+        </div>
+
+        <div class="card">
+            <h2>📅 Mes réservations</h2>
+            <p>Gérez vos créneaux de réservation.</p>
+            <a href="{{ path('app_reservation_index') }}" class="btn">Voir mes réservations</a>
+        </div>
+
+        <div class="card">
+            <h2>➕ Nouvelle réservation</h2>
+            <p>Réservez une salle rapidement.</p>
+            <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">Réserver</a>
+        </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="card card-admin">
+            <h2>⚙️ Administration</h2>
+            <p>Gérez les salles, utilisateurs et promotions.</p>
+            <a href="{{ path('app_admin_dashboard') }}" class="btn btn-admin">Accéder</a>
+        </div>
+        {% endif %}
+
+    </section>
 {% endblock %}
