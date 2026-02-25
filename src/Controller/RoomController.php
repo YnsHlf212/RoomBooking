@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Form\RoomType;
 use App\Repository\RoomRepository;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,10 +53,11 @@ final class RoomController extends AbstractController
 
     // Tout le monde peut voir le détail d'une salle
     #[Route('/{id}', name: 'app_room_show', methods: ['GET'])]
-    public function show(Room $room): Response
+    public function show(Room $room, ReservationRepository $reservationRepository): Response
     {
         return $this->render('room/show.html.twig', [
             'room' => $room,
+            'reservations' => $reservationRepository->findActiveByRoom($room),
         ]);
     }
 
