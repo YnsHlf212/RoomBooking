@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil — RoomBooking{% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur RoomBooking</h1>
+    <p>Connecté en tant que : {{ app.user.email }}</p>
+    <p>Rôle : {{ app.user.roles|join(', ') }}</p>
+{% endblock %}
