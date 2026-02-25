@@ -29,4 +29,18 @@ class SecurityController extends AbstractController
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
+
+    #[Route('/redirect', name: 'app_redirect_after_login')]
+    public function redirectAfterLogin(): Response
+    {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_admin_dashboard');
+        }
+
+        if ($this->isGranted('ROLE_COORDINATOR')) {
+            return $this->redirectToRoute('app_coordinator_dashboard');
+        }
+
+        return $this->redirectToRoute('app_home');
+    }
 }

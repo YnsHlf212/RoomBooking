@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block body %}
+    <h1>Zone Administration</h1>
+    <p>Bienvenue {{ app.user.firstName }}, vous êtes administrateur.</p>
+
+    <ul>
+        <li><a href="#">Gérer les salles</a></li>
+        <li><a href="#">Gérer les utilisateurs</a></li>
+        <li><a href="#">Gérer les promotions</a></li>
+    </ul>
+{% endblock %}

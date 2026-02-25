@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Coordinateur{% endblock %}
+
+{% block body %}
+    <h1>Zone Coordinateur</h1>
+    <p>Bienvenue {{ app.user.firstName }}, vous êtes coordinateur.</p>
+
+    <ul>
+        <li><a href="#">Mes classes</a></li>
+        <li><a href="#">Réserver une salle</a></li>
+    </ul>
+{% endblock %}
