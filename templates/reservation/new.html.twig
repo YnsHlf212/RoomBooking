@@ -1,11 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Reservation{% endblock %}
+{% block title %}Nouvelle réservation{% endblock %}
 
 {% block body %}
-    <h1>Create new Reservation</h1>
+    <div class="page-header">
+        <h1>📅 Nouvelle réservation</h1>
+        <a href="{{ path('app_reservation_index') }}" class="btn">← Retour</a>
+    </div>
 
-    {{ include('reservation/_form.html.twig') }}
+    <div class="card" style="max-width: 600px;">
+        {{ form_start(form) }}
+            {{ form_row(form.room) }}
+            {{ form_row(form.startDatetime) }}
+            {{ form_row(form.endDatetime) }}
 
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
+            <div id="date-error" class="alert alert-error" style="display:none;"></div>
+
+            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn btn-primary">Confirmer la réservation</button>
+                <a href="{{ path('app_reservation_index') }}" class="btn">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

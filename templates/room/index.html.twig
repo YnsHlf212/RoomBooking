@@ -3,41 +3,40 @@
 {% block title %}Room index{% endblock %}
 
 {% block body %}
-    <h1>Room index</h1>
+    <div class="page-header">
+        <h1>🏠 Salles disponibles</h1>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_room_new') }}" class="btn btn-primary">+ Nouvelle salle</a>
+        {% endif %}
+    </div>
 
-    <table class="table">
+    <input type="text" id="table-search"
+           placeholder="🔍 Rechercher une salle..."
+           style="margin-bottom:1.5rem; max-width:400px;">
+
+    <table>
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Capacity</th>
-                <th>Description</th>
-                <th>IsActive</th>
-                <th>CreatedAt</th>
-                <th>actions</th>
+                <th>Nom</th>
+                <th>Capacité</th>
+                <th>Statut</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for room in rooms %}
-            <tr>
-                <td>{{ room.id }}</td>
-                <td>{{ room.name }}</td>
-                <td>{{ room.capacity }}</td>
-                <td>{{ room.description }}</td>
-                <td>{{ room.isActive ? 'Yes' : 'No' }}</td>
-                <td>{{ room.createdAt ? room.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_room_show', {'id': room.id}) }}">show</a>
-                    <a href="{{ path('app_room_edit', {'id': room.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
+            {% for room in rooms %}
+                <tr>
+                    <td>{{ room.name }}</td>
+                    <td>{{ room.capacity }} personnes</td>
+                    <td>{{ room.isActive ? '🟢 Disponible' : '🔴 Indisponible' }}</td>
+                    <td>
+                        <a href="{{ path('app_room_show', {'id': room.id}) }}" class="btn">Voir</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_room_edit', {'id': room.id}) }}" class="btn">Modifier</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_room_new') }}">Create new</a>
 {% endblock %}

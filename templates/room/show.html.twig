@@ -3,22 +3,34 @@
 {% block title %}{{ room.name }}{% endblock %}
 
 {% block body %}
-    <h1>{{ room.name }}</h1>
+    <div class="page-header">
+        <h1>🏠 {{ room.name }}</h1>
+        <div style="display:flex; gap:0.5rem;">
+            <a href="{{ path('app_room_index') }}" class="btn">← Retour</a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_room_edit', {'id': room.id}) }}" class="btn">✏️ Modifier</a>
+            {% endif %}
+        </div>
+    </div>
 
-    <p>Capacité : {{ room.capacity }} personnes</p>
-    <p>Description : {{ room.description ?? 'Aucune description' }}</p>
-    <p>Statut : {{ room.isActive ? 'Disponible' : 'Indisponible' }}</p>
+    <div class="card" style="margin-bottom:1.5rem;">
+        <p><strong>Capacité :</strong> {{ room.capacity }} personnes</p>
+        <p><strong>Description :</strong> {{ room.description ?? 'Aucune description' }}</p>
+        <p><strong>Statut :</strong> {{ room.isActive ? '🟢 Disponible' : '🔴 Indisponible' }}</p>
 
-    {% if room.equipments|length > 0 %}
-        <h2>Équipements</h2>
-        <ul>
-            {% for equipment in room.equipments %}
-                <li>{{ equipment.name }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        {% if room.equipments|length > 0 %}
+            <p><strong>Équipements :</strong>
+                {% for equipment in room.equipments %}
+                    <span style="background:#eff6ff; color:#2563eb; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.8rem; margin-right:0.3rem;">
+                        {{ equipment.name }}
+                    </span>
+                {% endfor %}
+            </p>
+        {% endif %}
+    </div>
 
-    <h2>Réservations à venir</h2>
+    <h2 style="margin-bottom:1rem;">📅 Réservations à venir</h2>
+
     {% if reservations|length > 0 %}
         <table>
             <thead>
@@ -39,9 +51,18 @@
             </tbody>
         </table>
     {% else %}
-        <p>Aucune réservation à venir — salle disponible !</p>
+        <p style="color:#16a34a; margin-bottom:1.5rem;">✅ Aucune réservation à venir — salle disponible !</p>
     {% endif %}
 
-    <a href="{{ path('app_reservation_new') }}">Réserver cette salle</a>
-    <a href="{{ path('app_room_index') }}">Retour à la liste</a>
+    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+        <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">📅 Réserver cette salle</a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <form method="post" action="{{ path('app_room_delete', {'id': room.id}) }}"
+                  data-confirm="Êtes-vous sûr de vouloir supprimer la salle {{ room.name }} ?">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ room.id) }}">
+                <button type="submit" class="btn btn-danger">🗑 Supprimer</button>
+            </form>
+        {% endif %}
+    </div>
 {% endblock %}

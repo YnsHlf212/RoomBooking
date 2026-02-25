@@ -11,6 +11,8 @@
     <nav class="navbar">
         <a class="navbar-brand" href="{{ path('app_home') }}">🏫 RoomBooking</a>
 
+        <button id="menu-toggle" class="menu-toggle">☰</button>
+
         <ul class="navbar-menu">
             {% if app.user %}
                 <li><a href="{{ path('app_room_index') }}">Salles</a></li>
