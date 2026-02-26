@@ -1,40 +1,157 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil — RoomBooking{% endblock %}
+{% block title %}Tableau de bord — RoomBooking{% endblock %}
 
 {% block body %}
-    <section class="hero">
-        <h1>Bienvenue, {{ app.user.firstName }} 👋</h1>
-        <p>Gérez vos réservations de salles simplement et rapidement.</p>
-    </section>
 
-    <section class="dashboard-cards">
+    {# ====== HERO ====== #}
+    <div class="hero">
+        <h1>Bonjour, {{ app.user.firstName }} 👋</h1>
+        <p>
+            {% if is_granted('ROLE_ADMIN') %}
+                Vous êtes administrateur — accès complet à l'application.
+            {% elseif is_granted('ROLE_COORDINATOR') %}
+                Vous êtes coordinateur — gérez vos classes et réservations.
+            {% else %}
+                Bienvenue sur RoomBooking — réservez vos salles facilement.
+            {% endif %}
+        </p>
+    </div>
 
-        <div class="card">
-            <h2>🏠 Salles</h2>
-            <p>Consultez les salles disponibles et leurs équipements.</p>
-            <a href="{{ path('app_room_index') }}" class="btn">Voir les salles</a>
+    {# ====== STATS ADMIN ====== #}
+    {% if is_granted('ROLE_ADMIN') and stats is not empty %}
+        <div class="dashboard-cards" style="margin-bottom:2rem;">
+            <div class="card" style="text-align:center;">
+                <h2 style="font-size:2.5rem; color:#2563eb; margin-bottom:0.25rem;">
+                    {{ stats.totalRooms }}
+                </h2>
+                <p style="margin:0;">Salles actives</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <h2 style="font-size:2.5rem; color:#16a34a; margin-bottom:0.25rem;">
+                    {{ stats.totalReservations }}
+                </h2>
+                <p style="margin:0;">Réservations totales</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <h2 style="font-size:2.5rem; color:#d97706; margin-bottom:0.25rem;">
+                    {{ stats.todayReservations }}
+                </h2>
+                <p style="margin:0;">Réservations aujourd'hui</p>
+            </div>
         </div>
+    {% endif %}
 
+    {# ====== ACTIONS RAPIDES ====== #}
+    <div class="dashboard-cards" style="margin-bottom:2rem;">
         <div class="card">
-            <h2>📅 Mes réservations</h2>
-            <p>Gérez vos créneaux de réservation.</p>
-            <a href="{{ path('app_reservation_index') }}" class="btn">Voir mes réservations</a>
-        </div>
-
-        <div class="card">
-            <h2>➕ Nouvelle réservation</h2>
-            <p>Réservez une salle rapidement.</p>
+            <h2>📅 Nouvelle réservation</h2>
+            <p>Réservez rapidement une salle disponible.</p>
             <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">Réserver</a>
         </div>
 
-        {% if is_granted('ROLE_ADMIN') %}
-        <div class="card card-admin">
-            <h2>⚙️ Administration</h2>
-            <p>Gérez les salles, utilisateurs et promotions.</p>
-            <a href="{{ path('app_admin_dashboard') }}" class="btn btn-admin">Accéder</a>
+        <div class="card">
+            <h2>🏠 Salles disponibles</h2>
+            <p>{{ availableRooms|length }} salle(s) active(s) dans l'établissement.</p>
+            <a href="{{ path('app_room_index') }}" class="btn">Voir les salles</a>
         </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="card card-admin">
+                <h2>⚙️ Administration</h2>
+                <p>Gérez les salles, utilisateurs et promotions.</p>
+                <a href="{{ path('app_admin_dashboard') }}" class="btn btn-admin">Accéder</a>
+            </div>
         {% endif %}
 
-    </section>
+        {% if is_granted('ROLE_COORDINATOR') %}
+            <div class="card">
+                <h2>👥 Mes classes</h2>
+                <p>Consultez et gérez vos promotions.</p>
+                <a href="{{ path('app_coordinator_dashboard') }}" class="btn">Voir mes classes</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ====== RÉSERVATIONS À VENIR ====== #}
+    <div style="margin-bottom:2rem;">
+        <div class="page-header">
+            <h2>📆 Mes prochaines réservations</h2>
+            <a href="{{ path('app_reservation_index') }}" class="btn">Voir tout</a>
+        </div>
+
+        {% if upcomingReservations|length > 0 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Salle</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in upcomingReservations %}
+                        <tr>
+                            <td>🏠 {{ reservation.room.name }}</td>
+                            <td>{{ reservation.startDatetime|date('d/m/Y H:i') }}</td>
+                            <td>{{ reservation.endDatetime|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <form method="post"
+                                      action="{{ path('app_reservation_delete', {'id': reservation.id}) }}"
+                                      data-confirm="Annuler cette réservation ?">
+                                    <input type="hidden" name="_token"
+                                           value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                    <button type="submit" class="btn btn-danger">❌ Annuler</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="card" style="text-align:center; padding:2rem;">
+                <p style="color:#64748b; margin-bottom:1rem;">Aucune réservation à venir.</p>
+                <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">
+                    + Créer une réservation
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ====== RÉSERVATIONS PASSÉES ====== #}
+    {% if pastReservations|length > 0 %}
+        <div>
+            <div class="page-header">
+                <h2>🕐 Historique récent</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Salle</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in pastReservations %}
+                        <tr>
+                            <td>🏠 {{ reservation.room.name }}</td>
+                            <td>{{ reservation.startDatetime|date('d/m/Y H:i') }}</td>
+                            <td>{{ reservation.endDatetime|date('d/m/Y H:i') }}</td>
+                            <td>
+                                {% if reservation.cancelledAt %}
+                                    <span style="color:#dc2626;">❌ Annulée</span>
+                                {% else %}
+                                    <span style="color:#64748b;">⏱ Terminée</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
 {% endblock %}

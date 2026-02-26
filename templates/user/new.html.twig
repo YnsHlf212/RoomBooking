@@ -1,11 +1,22 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}New User{% endblock %}
-
+{% block title %}Nouvel utilisateur{% endblock %}
 {% block body %}
-    <h1>Create new User</h1>
 
-    {{ include('user/_form.html.twig') }}
+    <div class="page-header">
+        <h1>➕ Nouvel utilisateur</h1>
+        <a href="{{ path('app_user_index') }}" class="btn">← Retour</a>
+    </div>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+    <div class="card" style="max-width:600px;">
+        {{ form_start(form) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.lastName) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.roles) }}
+            {{ form_row(form.promotion) }}
+            {{ form_row(form.plainPassword) }}
+            <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Créer</button>
+        {{ form_end(form) }}
+    </div>
+
 {% endblock %}

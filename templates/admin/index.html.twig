@@ -1,26 +1,45 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Dashboard Admin{% endblock %}
-
 {% block body %}
-    <h1>⚙️ Administration</h1>
-    <p>Bienvenue {{ app.user.firstName }}, vous gérez l'application.</p>
+
+    <div class="hero">
+        <h1>⚙️ Administration</h1>
+        <p>Bienvenue {{ app.user.firstName }}, vous gérez l'application.</p>
+    </div>
 
     <div class="dashboard-cards">
         <div class="card">
             <h2>🏠 Salles</h2>
-            <a href="{{ path('app_room_index') }}" class="btn">Gérer les salles</a>
-            <a href="{{ path('app_room_new') }}" class="btn btn-primary">+ Nouvelle salle</a>
+            <p>Créez, modifiez et supprimez les salles de l'établissement.</p>
+            <div style="display:flex; gap:0.5rem;">
+                <a href="{{ path('app_room_index') }}" class="btn">Voir</a>
+                <a href="{{ path('app_room_new') }}" class="btn btn-primary">+ Nouvelle</a>
+            </div>
         </div>
 
         <div class="card">
             <h2>👥 Utilisateurs</h2>
-            <a href="{{ path('app_user_index') }}" class="btn">Gérer les utilisateurs</a>
+            <p>Gérez les comptes, rôles et mots de passe.</p>
+            <div style="display:flex; gap:0.5rem;">
+                <a href="{{ path('app_user_index') }}" class="btn">Voir</a>
+                <a href="{{ path('app_user_new') }}" class="btn btn-primary">+ Nouveau</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎓 Promotions</h2>
+            <p>Gérez les classes et l'affectation des étudiants.</p>
+            <div style="display:flex; gap:0.5rem;">
+                <a href="{{ path('app_promotion_index') }}" class="btn">Voir</a>
+                <a href="{{ path('app_promotion_new') }}" class="btn btn-primary">+ Nouvelle</a>
+            </div>
         </div>
 
         <div class="card">
             <h2>📅 Réservations</h2>
-            <a href="{{ path('app_reservation_index') }}" class="btn">Toutes les réservations</a>
+            <p>Consultez toutes les réservations de l'établissement.</p>
+            <a href="{{ path('app_reservation_index') }}" class="btn">Voir tout</a>
         </div>
     </div>
+
 {% endblock %}
