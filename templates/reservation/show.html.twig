@@ -1,38 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reservation{% endblock %}
+{% block title %}Détail de la réservation{% endblock %}
 
 {% block body %}
-    <h1>Reservation</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ reservation.id }}</td>
-            </tr>
-            <tr>
-                <th>StartDatetime</th>
-                <td>{{ reservation.startDatetime ? reservation.startDatetime|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>EndDatetime</th>
-                <td>{{ reservation.endDatetime ? reservation.endDatetime|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ reservation.createdAt ? reservation.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>CancelledAt</th>
-                <td>{{ reservation.cancelledAt ? reservation.cancelledAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="page-header">
+        <h1>📅 Détail de la réservation</h1>
+        <a href="{{ path('app_reservation_index') }}" class="btn">← Retour à la liste</a>
+    </div>
 
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
+    <div class="card" style="max-width:600px; margin-bottom:1.5rem;">
+        <p><strong>Salle :</strong> {{ reservation.room.name }}</p>
+        <p><strong>Date de début :</strong> {{ reservation.startDatetime|date('d/m/Y H:i') }}</p>
+        <p><strong>Date de fin :</strong> {{ reservation.endDatetime|date('d/m/Y H:i') }}</p>
+        <p><strong>Promotion concernée :</strong> {{ reservation.bookedFor ? reservation.bookedFor.name : '—' }}</p>
+        <p><strong>Réservé par :</strong> {{ reservation.owner.firstName }} {{ reservation.owner.lastName }}</p>
+        <p><strong>Créée le :</strong> {{ reservation.createdAt|date('d/m/Y H:i') }}</p>
+        <p>
+            <strong>Statut :</strong>
+            {% if reservation.cancelledAt %}
+                <span style="color:#dc2626;">❌ Annulée le {{ reservation.cancelledAt|date('d/m/Y H:i') }}</span>
+            {% elseif reservation.endDatetime < date() %}
+                <span style="color:#64748b;">⏱ Terminée</span>
+            {% else %}
+                <span style="color:#16a34a;">✅ Active</span>
+            {% endif %}
+        </p>
+    </div>
 
-    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">edit</a>
+    {# Bouton d'annulation uniquement si la réservation est encore active #}
+    {% if not reservation.cancelledAt and reservation.endDatetime > date() %}
+        <form method="post"
+              action="{{ path('app_reservation_cancel', {'id': reservation.id}) }}"
+              data-confirm="Êtes-vous sûr de vouloir annuler cette réservation ?">
+            <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ reservation.id) }}">
+            <button type="submit" class="btn btn-danger">❌ Annuler la réservation</button>
+        </form>
+    {% endif %}
 
-    {{ include('reservation/_delete_form.html.twig') }}
 {% endblock %}

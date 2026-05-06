@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Promotion;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
@@ -21,8 +22,8 @@ class Reservation
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
-    #[ORM\ManyToOne(inversedBy: 'bookedForReservations')]
-    private ?User $bookedFor = null;
+    #[ORM\ManyToOne]
+    private ?Promotion $bookedFor = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $startDatetime = null;
@@ -65,15 +66,14 @@ class Reservation
         return $this;
     }
 
-    public function getBookedFor(): ?User
+    public function getBookedFor(): ?Promotion
     {
         return $this->bookedFor;
     }
 
-    public function setBookedFor(?User $bookedFor): static
+    public function setBookedFor(?Promotion $bookedFor): static
     {
         $this->bookedFor = $bookedFor;
-
         return $this;
     }
 

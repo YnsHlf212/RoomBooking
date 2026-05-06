@@ -55,7 +55,9 @@
     {% endif %}
 
     <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-        <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">📅 Réserver cette salle</a>
+        <a href="{{ path('app_reservation_new', {'room': room.id}) }}" class="btn btn-primary">
+            📅 Réserver cette salle
+        </a>
 
         {% if is_granted('ROLE_ADMIN') %}
             <form method="post" action="{{ path('app_room_delete', {'id': room.id}) }}"

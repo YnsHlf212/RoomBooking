@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\MailService;
+use App\Entity\Room;
 
 #[Route('/reservation')]
 final class ReservationController extends AbstractController
@@ -32,6 +33,16 @@ final class ReservationController extends AbstractController
     ): Response
     {
         $reservation = new Reservation();
+
+        // Pré-sélectionner la salle si passée en paramètre URL
+        $roomId = $request->query->get('room');
+        if ($roomId) {
+            $room = $entityManager->getRepository(Room::class)->find($roomId);
+            if ($room) {
+                $reservation->setRoom($room);
+            }
+        }
+
         $form = $this->createForm(Reservation1Type::class, $reservation);
         $form->handleRequest($request);
 
@@ -150,5 +161,33 @@ final class ReservationController extends AbstractController
         }
 
         return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/cancel', name: 'app_reservation_cancel', methods: ['POST'])]
+    public function cancel(
+        Request $request,
+        Reservation $reservation,
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        // Vérifier que l'user est bien le propriétaire ou admin
+        if ($reservation->getOwner() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas annuler cette réservation.');
+        }
+
+        // Vérifier que la réservation n'est pas déjà annulée
+        if ($reservation->getCancelledAt()) {
+            $this->addFlash('error', 'Cette réservation est déjà annulée.');
+            return $this->redirectToRoute('app_reservation_show', ['id' => $reservation->getId()]);
+        }
+
+        if ($this->isCsrfTokenValid('cancel'.$reservation->getId(), $request->getPayload()->getString('_token'))) {
+            // On met à jour la date d'annulation au lieu de supprimer
+            $reservation->setCancelledAt(new \DateTimeImmutable());
+            $entityManager->flush();
+            $this->addFlash('success', 'Réservation annulée avec succès.');
+        }
+
+        return $this->redirectToRoute('app_reservation_index');
     }
 }

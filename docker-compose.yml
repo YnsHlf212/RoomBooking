@@ -1,0 +1,65 @@
+services:
+  # Base de données MariaDB
+  db:
+    image: mariadb:10.11
+    container_name: roombooking_db
+    hostname: roombooking_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      roombooking_network:
+        ipv4_address: 10.10.30.2
+
+  # Application Symfony
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roombooking_app
+    hostname: roombooking_app
+    restart: unless-stopped
+    volumes:
+      - var_cache:/var/www/html/var/cache
+      - var_logs:/var/www/html/var/log
+    depends_on:
+      - db
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASS}@roombooking_db:3306/${DB_NAME}?serverVersion=10.11.11-MariaDB&charset=utf8mb4
+      MAILER_DSN: ${MAILER_DSN}
+    networks:
+      roombooking_network:
+        ipv4_address: 10.10.30.4
+      admin_proxy: {}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=admin_proxy"
+      - "traefik.http.routers.roombooking-router.entrypoints=web"
+      - "traefik.http.routers.roombooking-router.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.roombooking-router.priority=100"
+      - "traefik.http.routers.roombooking-router.service=roombooking-svc"
+      - "traefik.http.services.roombooking-svc.loadbalancer.server.port=80"
+
+volumes:
+  db_data:
+    driver: local
+  var_cache:
+    driver: local
+  var_logs:
+    driver: local
+
+networks:
+  roombooking_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.30.0/24
+  admin_proxy:
+    external: true

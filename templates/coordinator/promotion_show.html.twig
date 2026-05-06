@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ promotion.name }}{% endblock %}
+{% block body %}
+
+    <div class="page-header">
+        <h1>🎓 {{ promotion.name }}</h1>
+        <div style="display:flex; gap:0.5rem;">
+            <a href="{{ path('app_coordinator_dashboard') }}" class="btn">← Retour</a>
+            <a href="{{ path('app_coordinator_student_new', {'id': promotion.id}) }}"
+               class="btn btn-primary">
+                + Ajouter un étudiant
+            </a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem;">
+        <p><strong>Nombre d'étudiants :</strong> {{ promotion.users|length }}</p>
+        <p><strong>Créée le :</strong> {{ promotion.createdAt|date('d/m/Y') }}</p>
+    </div>
+
+    <h2 style="margin-bottom:1rem;">👨‍🎓 Liste des étudiants</h2>
+
+    {% if promotion.users|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Membre depuis</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in promotion.users %}
+                    <tr>
+                        <td>{{ student.firstName }} {{ student.lastName }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.createdAt|date('d/m/Y') }}</td>
+                        <td>
+                            <form method="post"
+                                  action="{{ path('app_coordinator_student_remove', {
+                                      'promotionId': promotion.id,
+                                      'studentId': student.id
+                                  }) }}"
+                                  data-confirm="Retirer {{ student.firstName }} de cette promotion ?">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('remove' ~ student.id) }}">
+                                <button type="submit" class="btn btn-danger">
+                                    ✂️ Retirer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="card" style="text-align:center; padding:2rem;">
+            <p style="color:#64748b; margin-bottom:1rem;">
+                Aucun étudiant dans cette promotion.
+            </p>
+            <a href="{{ path('app_coordinator_student_new', {'id': promotion.id}) }}"
+               class="btn btn-primary">
+                + Ajouter un étudiant
+            </a>
+        </div>
+    {% endif %}
+
+{% endblock %}

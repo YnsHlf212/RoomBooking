@@ -1,13 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Reservation{% endblock %}
+{% block title %}Modifier la réservation{% endblock %}
 
 {% block body %}
-    <h1>Edit Reservation</h1>
 
-    {{ include('reservation/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="page-header">
+        <h1>✏️ Modifier la réservation</h1>
+        <a href="{{ path('app_reservation_index') }}" class="btn">← Retour à la liste</a>
+    </div>
 
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
+    <div class="card" style="max-width:600px;">
+        {{ form_start(form) }}
+            {{ form_row(form.room) }}
+            {{ form_row(form.startDatetime) }}
+            {{ form_row(form.endDatetime) }}
+            {{ form_row(form.bookedFor) }}
 
-    {{ include('reservation/_delete_form.html.twig') }}
+            <div id="date-error" class="alert alert-error" style="display:none;"></div>
+
+            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="submit" class="btn btn-primary">💾 Mettre à jour</button>
+                <a href="{{ path('app_reservation_index') }}" class="btn">← Retour à la liste</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
 {% endblock %}

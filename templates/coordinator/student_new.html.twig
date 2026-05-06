@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}Ajouter un étudiant{% endblock %}
+{% block body %}
+
+    <div class="page-header">
+        <h1>➕ Ajouter un étudiant</h1>
+        <a href="{{ path('app_coordinator_promotion_show', {'id': promotion.id}) }}"
+           class="btn">← Retour</a>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem;">
+        <p>Promotion : <strong>{{ promotion.name }}</strong></p>
+    </div>
+
+    <div class="card" style="max-width:600px;">
+        {{ form_start(form) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.lastName) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.plainPassword) }}
+            <button type="submit" class="btn btn-primary" style="margin-top:1rem;">
+                Ajouter l'étudiant
+            </button>
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
